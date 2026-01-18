@@ -27,11 +27,13 @@ const palette = [
 ];
 
 const escapeSql = (value) => value.replace(/'/g, "''");
+const normalizeString = (value) =>
+  typeof value === "string" ? value.trim() : value;
 
 const getFilterState = () => {
-  const basin = basinSelect.value.trim();
-  const state = stateSelect.value.trim();
-  const river = riverSelect.value.trim();
+  const basin = normalizeString(basinSelect.value);
+  const state = normalizeString(stateSelect.value);
+  const river = normalizeString(riverSelect.value);
   const minAge =
     ageMinInput.value.trim() === "" ? Number.NaN : Number(ageMinInput.value);
   const maxAge =
@@ -293,12 +295,20 @@ const init = async () => {
   const states = new Set();
   const rivers = new Set();
   const ages = [];
-  rawFeatures = geojson.features.map((feature) => feature.properties || {});
+  rawFeatures = geojson.features.map((feature) => {
+    const props = feature.properties || {};
+    return {
+      ...props,
+      BASIN: normalizeString(props.BASIN),
+      STATE: normalizeString(props.STATE),
+      RIVER: normalizeString(props.RIVER),
+    };
+  });
 
   geojson.features.forEach((feature) => {
-    const basin = feature.properties?.BASIN;
-    const stateValue = feature.properties?.STATE;
-    const river = feature.properties?.RIVER;
+    const basin = normalizeString(feature.properties?.BASIN);
+    const stateValue = normalizeString(feature.properties?.STATE);
+    const river = normalizeString(feature.properties?.RIVER);
     const age = Number(feature.properties?.UNCAL_DATA);
     if (basin) {
       basins.add(basin);
