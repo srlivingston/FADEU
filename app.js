@@ -11,7 +11,6 @@ const ageModeSelect = document.getElementById("age-mode");
 const sortOrderSelect = document.getElementById("sort-order");
 const applyButton = document.getElementById("apply-filter");
 const resetButton = document.getElementById("reset-filter");
-const recordCount = document.getElementById("record-count");
 const resultsBody = document.getElementById("results-body");
 
 let layerView;
@@ -33,10 +32,14 @@ const getFilterState = () => {
   const basin = basinSelect.value.trim();
   const state = stateSelect.value.trim();
   const river = riverSelect.value.trim();
-  const minAge = ageMinInput.value.trim() === "" ? Number.NaN : Number(ageMinInput.value);
-  const maxAge = ageMaxInput.value.trim() === "" ? Number.NaN : Number(ageMaxInput.value);
+  const minAge =
+    ageMinInput.value.trim() === "" ? Number.NaN : Number(ageMinInput.value);
+  const maxAge =
+    ageMaxInput.value.trim() === "" ? Number.NaN : Number(ageMaxInput.value);
   const maxUncertainty =
-    uncertaintyMaxInput.value.trim() === "" ? Number.NaN : Number(uncertaintyMaxInput.value);
+    uncertaintyMaxInput.value.trim() === ""
+      ? Number.NaN
+      : Number(uncertaintyMaxInput.value);
   const mode = ageModeSelect.value;
 
   return {
@@ -52,7 +55,15 @@ const getFilterState = () => {
 
 const buildWhere = (state) => {
   const clauses = [];
-  const { basin, state: stateValue, river, minAge, maxAge, maxUncertainty, mode } = state;
+  const {
+    basin,
+    state: stateValue,
+    river,
+    minAge,
+    maxAge,
+    maxUncertainty,
+    mode,
+  } = state;
 
   if (basin) {
     clauses.push(`BASIN = '${escapeSql(basin)}'`);
@@ -228,9 +239,6 @@ const updateResults = (state) => {
       break;
   }
 
-  resultsBody.innerHTML = "";
-  recordCount.textContent = `${sorted.length} records shown`;
-
   if (sorted.length === 0) {
     const row = document.createElement("tr");
     const cell = document.createElement("td");
@@ -242,7 +250,8 @@ const updateResults = (state) => {
   }
 
   sorted.forEach((attrs) => {
-    const { RIVER, BASIN, STATE, UNCAL_DATA, MARGIN, UNCAL_MIN, UNCAL_MAX } = attrs;
+    const { RIVER, BASIN, STATE, UNCAL_DATA, MARGIN, UNCAL_MIN, UNCAL_MAX } =
+      attrs;
     const row = document.createElement("tr");
 
     const riverCell = document.createElement("td");
@@ -339,11 +348,11 @@ const init = async () => {
   ageMinInput.value = minAge;
   ageMaxInput.value = maxAge;
 
-  require([
-    "esri/Map",
-    "esri/views/MapView",
-    "esri/layers/GeoJSONLayer",
-  ], (Map, MapView, GeoJSONLayer) => {
+  require(["esri/Map", "esri/views/MapView", "esri/layers/GeoJSONLayer"], (
+    Map,
+    MapView,
+    GeoJSONLayer,
+  ) => {
     const fields = [
       { name: "AUTHOR", type: "string" },
       { name: "DATE", type: "integer" },
@@ -384,10 +393,16 @@ const init = async () => {
               { fieldName: "MATERIAL", label: "Material" },
               { fieldName: "LAB_CODE", label: "Lab Code" },
               { fieldName: "STATE", label: "State" },
-              { fieldName: "SEDIMENTARY_CONTEXT", label: "Sedimentary Context" },
+              {
+                fieldName: "SEDIMENTARY_CONTEXT",
+                label: "Sedimentary Context",
+              },
               { fieldName: "UNCAL_DATA", label: "Uncal Data" },
               { fieldName: "MARGIN", label: "Margin" },
-              { fieldName: "DEPOSITION_ENVIRONMENT", label: "Deposition Environment" },
+              {
+                fieldName: "DEPOSITION_ENVIRONMENT",
+                label: "Deposition Environment",
+              },
               { fieldName: "ALLUVIAL_ESSEMBLE", label: "Alluvial Assemble" },
               { fieldName: "BASIN", label: "Basin" },
             ],

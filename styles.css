@@ -53,6 +53,22 @@ h1 {
   margin: 0;
 }
 
+.header-link {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.header-link a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(217, 90, 61, 0.4);
+}
+
+.header-link a:hover {
+  border-bottom-color: var(--accent);
+}
+
 .header-meta {
   display: flex;
   flex-direction: column;
