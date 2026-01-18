@@ -195,6 +195,7 @@ button.ghost {
   border-radius: 14px;
   border: 1px solid var(--border);
   background: var(--surface-strong);
+  max-height: 320px;
 }
 
 table {
