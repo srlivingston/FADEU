@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>FADEU Basin Explorer</title>
+        <link rel="icon" href="favicon.ico" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            rel="stylesheet"
+            href="https://js.arcgis.com/4.29/esri/themes/light/main.css"
+        />
+        <link rel="stylesheet" href="styles.css" />
+        <script src="https://js.arcgis.com/4.29/"></script>
+    </head>
+    <body>
+        <div class="app-shell">
+            <header class="app-header">
+                <div>
+                    <h1>FADEU Dataset Explorer</h1>
+                </div>
+                <div class="header-meta">
+                    <span class="chip" id="record-count">Loading data...</span>
+                </div>
+            </header>
+
+            <main class="app-main">
+                <section class="control-panel">
+                    <h2>Filter Records</h2>
+                    <p class="panel-note">
+                        Filter by basin and radiocarbon age.
+                    </p>
+
+                    <label class="field">
+                        <span>Basin</span>
+                        <select id="basin-select">
+                            <option value="">All basins</option>
+                        </select>
+                    </label>
+
+                    <label class="field">
+                        <span>State</span>
+                        <select id="state-select">
+                            <option value="">All states</option>
+                        </select>
+                    </label>
+
+                    <label class="field">
+                        <span>River</span>
+                        <select id="river-select">
+                            <option value="">All rivers</option>
+                        </select>
+                    </label>
+
+                    <div class="field">
+                        <label class="field">
+                            <span>Min age (14C yr BP)</span>
+                            <input
+                                id="age-min"
+                                type="number"
+                                placeholder="e.g., 12000"
+                            />
+                        </label>
+                    </div>
+
+                    <div class="field">
+                        <label class="field">
+                            <span>Max age (14C yr BP)</span>
+                            <input
+                                id="age-max"
+                                type="number"
+                                placeholder="e.g., 18000"
+                            />
+                        </label>
+                    </div>
+
+                    <label class="field">
+                        <span>Max uncertainty (+/-)</span>
+                        <input
+                            id="uncertainty-max"
+                            type="number"
+                            placeholder="e.g., 200"
+                        />
+                    </label>
+
+                    <label class="field">
+                        <span>Age filter mode</span>
+                        <select id="age-mode">
+                            <option value="overlap">Overlap (default)</option>
+                            <option value="center">Center in range</option>
+                            <option value="contained">Fully contained</option>
+                        </select>
+                    </label>
+
+                    <label class="field">
+                        <span>Sort results</span>
+                        <select id="sort-order">
+                            <option value="uncal-desc">
+                                Age: oldest to youngest
+                            </option>
+                            <option value="uncal-asc">
+                                Age: youngest to oldest
+                            </option>
+                            <option value="margin-asc">
+                                Uncertainty: lowest first
+                            </option>
+                        </select>
+                    </label>
+
+                    <div class="actions">
+                        <button id="apply-filter" class="primary">
+                            Apply filters
+                        </button>
+                        <button id="reset-filter" class="ghost">Reset</button>
+                    </div>
+
+                    <div class="panel-foot">
+                        <p class="hint">
+                            Tip: Click any point for full metadata.
+                        </p>
+                    </div>
+
+                </section>
+
+                <section class="map-panel">
+                    <div id="viewDiv"></div>
+                </section>
+            </main>
+
+            <section class="results-table">
+                <div class="table-head">
+                    <h3>Visible Records</h3>
+                    <span class="table-note">
+                        Sorted by the current selection above.
+                    </span>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>River</th>
+                                <th>Basin</th>
+                                <th>State</th>
+                                <th>Uncal Age</th>
+                                <th>+/-</th>
+                                <th>Range</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-body"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <script src="app.js"></script>
+    </body>
+</html>
