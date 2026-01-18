@@ -220,6 +220,7 @@ const updateResults = (state) => {
   if (rawFeatures.length === 0) {
     return;
   }
+  resultsBody.innerHTML = "";
   const filtered = rawFeatures.filter((attrs) => matchesFilter(attrs, state));
   const sorted = filtered.slice();
   switch (sortOrderSelect.value) {
