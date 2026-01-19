@@ -39,104 +39,106 @@
             <main class="app-main">
                 <section class="control-panel">
                     <h2>Filter Records</h2>
-                    <p class="panel-note">
-                        Filter by basin and radiocarbon age.
-                    </p>
 
-                    <label class="field">
-                        <span>Basin</span>
-                        <select id="basin-select">
-                            <option value="">All basins</option>
-                        </select>
-                    </label>
-
-                    <label class="field">
-                        <span>State</span>
-                        <select id="state-select">
-                            <option value="">All states</option>
-                        </select>
-                    </label>
-
-                    <label class="field">
-                        <span>River</span>
-                        <select id="river-select">
-                            <option value="">All rivers</option>
-                        </select>
-                    </label>
-
-                    <label class="field">
-                        <span>Deposition Environment</span>
-                        <select id="deposition-select">
-                            <option value="">All environments</option>
-                        </select>
-                    </label>
-
-                    <div class="field">
+                    <div class="panel-fields">
                         <label class="field">
-                            <span>Min age</span>
+                            <span>Basin</span>
+                            <select id="basin-select">
+                                <option value="">All basins</option>
+                            </select>
+                        </label>
+
+                        <label class="field">
+                            <span>State</span>
+                            <select id="state-select">
+                                <option value="">All states</option>
+                            </select>
+                        </label>
+
+                        <label class="field">
+                            <span>River</span>
+                            <select id="river-select">
+                                <option value="">All rivers</option>
+                            </select>
+                        </label>
+
+                        <label class="field">
+                            <span>Deposition</span>
+                            <select id="deposition-select">
+                                <option value="">All environments</option>
+                            </select>
+                        </label>
+
+                        <div class="field-group full">
+                            <label class="field">
+                                <span>Min age</span>
+                                <input
+                                    id="age-min"
+                                    type="number"
+                                    placeholder="e.g., 12000"
+                                />
+                            </label>
+                            <label class="field">
+                                <span>Max age</span>
+                                <input
+                                    id="age-max"
+                                    type="number"
+                                    placeholder="e.g., 18000"
+                                />
+                            </label>
+                        </div>
+
+                        <label class="field">
+                            <span>Uncertainty (+/-)</span>
                             <input
-                                id="age-min"
+                                id="uncertainty-max"
                                 type="number"
-                                placeholder="e.g., 12000"
+                                placeholder="e.g., 200"
                             />
                         </label>
-                    </div>
 
-                    <div class="field">
                         <label class="field">
-                            <span>Max age</span>
-                            <input
-                                id="age-max"
-                                type="number"
-                                placeholder="e.g., 18000"
-                            />
+                            <span>Age filter mode</span>
+                            <select id="age-mode">
+                                <option value="overlap">
+                                    Overlap (default)
+                                </option>
+                                <option value="center">Center in range</option>
+                                <option value="contained">
+                                    Fully contained
+                                </option>
+                            </select>
                         </label>
-                    </div>
 
-                    <label class="field">
-                        <span>Max uncertainty (+/-)</span>
-                        <input
-                            id="uncertainty-max"
-                            type="number"
-                            placeholder="e.g., 200"
-                        />
-                    </label>
+                        <label class="field full">
+                            <span>Sort results</span>
+                            <select id="sort-order">
+                                <option value="uncal-desc">
+                                    Age: oldest to youngest
+                                </option>
+                                <option value="uncal-asc">
+                                    Age: youngest to oldest
+                                </option>
+                                <option value="margin-asc">
+                                    Uncertainty: lowest first
+                                </option>
+                            </select>
+                        </label>
 
-                    <label class="field">
-                        <span>Age filter mode</span>
-                        <select id="age-mode">
-                            <option value="overlap">Overlap (default)</option>
-                            <option value="center">Center in range</option>
-                            <option value="contained">Fully contained</option>
-                        </select>
-                    </label>
+                        <div class="actions full">
+                            <button id="apply-filter" class="primary">
+                                Apply filters
+                            </button>
+                            <button id="reset-filter" class="ghost">
+                                Reset
+                            </button>
+                        </div>
 
-                    <label class="field">
-                        <span>Sort results</span>
-                        <select id="sort-order">
-                            <option value="uncal-desc">
-                                Age: oldest to youngest
-                            </option>
-                            <option value="uncal-asc">
-                                Age: youngest to oldest
-                            </option>
-                            <option value="margin-asc">
-                                Uncertainty: lowest first
-                            </option>
-                        </select>
-                    </label>
-
-                    <div class="actions">
-                        <button id="apply-filter" class="primary">
-                            Apply filters
-                        </button>
-                        <button id="reset-filter" class="ghost">Reset</button>
-                    </div>
-
-                    <div class="panel-foot">
-                        <p class="hint">
-                            Tip: Click any point for full metadata.
-                        </p>
+                        <div class="panel-foot full">
+                            <p class="hint">
+                                Tip: Click any point for full metadata.
+                            </p>
+                        </div>
                     </div>
                 </section>
 
