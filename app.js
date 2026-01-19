@@ -4,6 +4,7 @@ const dataUrl = "./data/points.geojson";
 const basinSelect = document.getElementById("basin-select");
 const stateSelect = document.getElementById("state-select");
 const riverSelect = document.getElementById("river-select");
+const depositionSelect = document.getElementById("deposition-select");
 const ageMinInput = document.getElementById("age-min");
 const ageMaxInput = document.getElementById("age-max");
 const uncertaintyMaxInput = document.getElementById("uncertainty-max");
@@ -34,6 +35,7 @@ const getFilterState = () => {
   const basin = normalizeString(basinSelect.value);
   const state = normalizeString(stateSelect.value);
   const river = normalizeString(riverSelect.value);
+  const depositionEnvironment = normalizeString(depositionSelect.value);
   const minAge =
     ageMinInput.value.trim() === "" ? Number.NaN : Number(ageMinInput.value);
   const maxAge =
@@ -48,6 +50,7 @@ const getFilterState = () => {
     basin,
     state,
     river,
+    depositionEnvironment,
     minAge,
     maxAge,
     maxUncertainty,
@@ -61,6 +64,7 @@ const buildWhere = (state) => {
     basin,
     state: stateValue,
     river,
+    depositionEnvironment,
     minAge,
     maxAge,
     maxUncertainty,
@@ -75,6 +79,11 @@ const buildWhere = (state) => {
   }
   if (river) {
     clauses.push(`RIVER = '${escapeSql(river)}'`);
+  }
+  if (depositionEnvironment) {
+    clauses.push(
+      `DEPOSITION_ENVIRONMENT = '${escapeSql(depositionEnvironment)}'`,
+    );
   }
 
   if (!Number.isNaN(minAge) || !Number.isNaN(maxAge)) {
@@ -123,6 +132,7 @@ const resetFilter = async (defaults) => {
   basinSelect.value = "";
   stateSelect.value = "";
   riverSelect.value = "";
+  depositionSelect.value = "";
   ageMinInput.value = defaults.minAge ?? "";
   ageMaxInput.value = defaults.maxAge ?? "";
   uncertaintyMaxInput.value = "";
@@ -156,7 +166,10 @@ const matchesFilter = (attrs, state) => {
   const basinOk = !state.basin || attrs.BASIN === state.basin;
   const stateOk = !state.state || attrs.STATE === state.state;
   const riverOk = !state.river || attrs.RIVER === state.river;
-  if (!basinOk || !stateOk || !riverOk) {
+  const depositionOk =
+    !state.depositionEnvironment ||
+    attrs.DEPOSITION_ENVIRONMENT === state.depositionEnvironment;
+  if (!basinOk || !stateOk || !riverOk || !depositionOk) {
     return false;
   }
 
@@ -253,15 +266,27 @@ const updateResults = (state) => {
   }
 
   sorted.forEach((attrs) => {
-    const { RIVER, BASIN, STATE, UNCAL_DATA, MARGIN, UNCAL_MIN, UNCAL_MAX } =
-      attrs;
+    const {
+      RIVER,
+      BASIN,
+      STATE,
+      DEPOSITION_ENVIRONMENT,
+      UNCAL_DATA,
+      MARGIN,
+      UNCAL_MIN,
+      UNCAL_MAX,
+    } = attrs;
     const row = document.createElement("tr");
+
+    const basinCell = document.createElement("td");
+    basinCell.textContent = BASIN || "Unknown basin";
 
     const riverCell = document.createElement("td");
     riverCell.textContent = RIVER || "Unknown river";
 
-    const basinCell = document.createElement("td");
-    basinCell.textContent = BASIN || "Unknown basin";
+    const depositionCell = document.createElement("td");
+    depositionCell.textContent =
+      DEPOSITION_ENVIRONMENT || "Unknown environment";
 
     const stateCell = document.createElement("td");
     stateCell.textContent = STATE || "n/a";
@@ -279,8 +304,9 @@ const updateResults = (state) => {
     rangeCell.textContent = `${UNCAL_MIN ?? "n/a"}–${UNCAL_MAX ?? "n/a"}`;
     rangeCell.className = "meta";
 
-    row.appendChild(riverCell);
     row.appendChild(basinCell);
+    row.appendChild(riverCell);
+    row.appendChild(depositionCell);
     row.appendChild(stateCell);
     row.appendChild(ageCell);
     row.appendChild(marginCell);
@@ -295,6 +321,7 @@ const init = async () => {
   const basins = new Set();
   const states = new Set();
   const rivers = new Set();
+  const depositionEnvironments = new Set();
   const ages = [];
   rawFeatures = geojson.features.map((feature) => {
     const props = feature.properties || {};
@@ -303,6 +330,7 @@ const init = async () => {
       BASIN: normalizeString(props.BASIN),
       STATE: normalizeString(props.STATE),
       RIVER: normalizeString(props.RIVER),
+      DEPOSITION_ENVIRONMENT: normalizeString(props.DEPOSITION_ENVIRONMENT),
     };
   });
 
@@ -310,6 +338,9 @@ const init = async () => {
     const basin = normalizeString(feature.properties?.BASIN);
     const stateValue = normalizeString(feature.properties?.STATE);
     const river = normalizeString(feature.properties?.RIVER);
+    const depositionEnvironment = normalizeString(
+      feature.properties?.DEPOSITION_ENVIRONMENT,
+    );
     const age = Number(feature.properties?.UNCAL_DATA);
     if (basin) {
       basins.add(basin);
@@ -319,6 +350,9 @@ const init = async () => {
     }
     if (river) {
       rivers.add(river);
+    }
+    if (depositionEnvironment) {
+      depositionEnvironments.add(depositionEnvironment);
     }
     if (!Number.isNaN(age)) {
       ages.push(age);
@@ -347,6 +381,14 @@ const init = async () => {
     option.value = river;
     option.textContent = river;
     riverSelect.appendChild(option);
+  });
+
+  const sortedDepositionEnvironments = Array.from(depositionEnvironments).sort();
+  sortedDepositionEnvironments.forEach((depositionEnvironment) => {
+    const option = document.createElement("option");
+    option.value = depositionEnvironment;
+    option.textContent = depositionEnvironment;
+    depositionSelect.appendChild(option);
   });
 
   const minAge = Math.min(...ages);
