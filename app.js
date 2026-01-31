@@ -12,10 +12,12 @@ const ageModeSelect = document.getElementById("age-mode");
 const sortOrderSelect = document.getElementById("sort-order");
 const applyButton = document.getElementById("apply-filter");
 const resetButton = document.getElementById("reset-filter");
+const exportButton = document.getElementById("export-csv");
 const resultsBody = document.getElementById("results-body");
 
 let layerView;
 let rawFeatures = [];
+let lastResults = [];
 
 const palette = [
   "#d95a3d",
@@ -255,10 +257,16 @@ const updateResults = (state) => {
       break;
   }
 
+  lastResults = sorted;
+  if (exportButton) {
+    exportButton.disabled = sorted.length === 0;
+    exportButton.textContent = `Export CSV${sorted.length ? ` (${sorted.length})` : ""}`;
+  }
+
   if (sorted.length === 0) {
     const row = document.createElement("tr");
     const cell = document.createElement("td");
-    cell.colSpan = 6;
+    cell.colSpan = 7;
     cell.textContent = "No records match the current filters.";
     row.appendChild(cell);
     resultsBody.appendChild(row);
@@ -313,6 +321,90 @@ const updateResults = (state) => {
     row.appendChild(rangeCell);
     resultsBody.appendChild(row);
   });
+};
+
+const csvEscape = (value) => {
+  if (value === null || value === undefined) {
+    return "";
+  }
+  const text = String(value);
+  if (/[",\n\r]/.test(text)) {
+    return `"${text.replace(/"/g, '""')}"`;
+  }
+  return text;
+};
+
+const formatDateStamp = () => {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+};
+
+const exportCsv = () => {
+  if (!lastResults.length) {
+    return;
+  }
+  const header = [
+    "Basin",
+    "River",
+    "Deposition Env.",
+    "State",
+    "Uncal Age",
+    "+/-",
+    "Range",
+    "Author",
+    "Publication Year",
+    "Material",
+    "Lab Code",
+    "Sedimentary Context",
+    "Alluvial Assemble",
+  ];
+  const rows = lastResults.map((attrs) => {
+    const basin = attrs.BASIN || "Unknown basin";
+    const river = attrs.RIVER || "Unknown river";
+    const deposition = attrs.DEPOSITION_ENVIRONMENT || "Unknown environment";
+    const state = attrs.STATE || "n/a";
+    const uncal = attrs.UNCAL_DATA ?? "n/a";
+    const margin = attrs.MARGIN ?? "n/a";
+    const range = `${attrs.UNCAL_MIN ?? "n/a"}-${attrs.UNCAL_MAX ?? "n/a"}`;
+    const author = attrs.AUTHOR || "n/a";
+    const publicationYear = attrs.DATE ?? "n/a";
+    const material = attrs.MATERIAL || "n/a";
+    const labCode = attrs.LAB_CODE || "n/a";
+    const sedimentaryContext = attrs.SEDIMENTARY_CONTEXT || "n/a";
+    const alluvialAssemble = attrs.ALLUVIAL_ESSEMBLE || "n/a";
+    return [
+      basin,
+      river,
+      deposition,
+      state,
+      uncal,
+      margin,
+      range,
+      author,
+      publicationYear,
+      material,
+      labCode,
+      sedimentaryContext,
+      alluvialAssemble,
+    ];
+  });
+
+  const csvLines = [
+    header.map(csvEscape).join(","),
+    ...rows.map((row) => row.map(csvEscape).join(",")),
+  ];
+  const blob = new Blob([csvLines.join("\r\n")], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `fadeu-visible-records-${formatDateStamp()}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 };
 
 const init = async () => {
@@ -488,6 +580,9 @@ const init = async () => {
   applyButton.addEventListener("click", applyFilter);
   resetButton.addEventListener("click", () => resetFilter({ minAge, maxAge }));
   sortOrderSelect.addEventListener("change", applyFilter);
+  if (exportButton) {
+    exportButton.addEventListener("click", exportCsv);
+  }
 };
 
 init();

@@ -213,9 +213,21 @@ button.ghost {
   font-size: 1.05rem;
 }
 
+.table-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .table-note {
   font-size: 0.85rem;
   color: var(--muted);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 .table-wrap {
